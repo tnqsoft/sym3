@@ -1,0 +1,10 @@
+{% if is_granted('IS_AUTHENTICATED_FULLY') or is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+    <p>
+        Hello {{ app.user.username }} !. [<a href="{{ path('security_logout') }}">Logout</a>]
+        | <a href="{{ path('homepage') }}">Home Page</a>
+        | <a href="{{ path('adminpage') }}">Admin</a>
+    </p>
+    <hr/>
+{% else %}
+    <p><a href="{{ path('security_login') }}">Member Login</a></p>
+{% endif %}
