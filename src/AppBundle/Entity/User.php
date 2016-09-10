@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
- * @ORM\Table(name="symfony_demo_user")
+ * @ORM\Table(name="user")
  *
  * Defines the properties of the User entity to represent the application users.
  * See http://symfony.com/doc/current/book/doctrine.html#creating-an-entity-class
@@ -16,8 +16,6 @@ use Symfony\Component\Security\Core\User\AdvancedUserInterface;
  * Tip: if you have an existing database, you can generate these entity class automatically.
  * See http://symfony.com/doc/current/cookbook/doctrine/reverse_engineering.html
  *
- * @author Ryan Weaver <weaverryan@gmail.com>
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
 class User implements AdvancedUserInterface, \Serializable
 {
@@ -49,9 +47,12 @@ class User implements AdvancedUserInterface, \Serializable
     private $isActive;
 
     /**
-     * @ORM\Column(type="json_array")
+     * @var UserGroup
+     *
+     * @ORM\ManyToOne(targetEntity="UserGroup", inversedBy="users")
+     * @ORM\JoinColumn(name="group_id", referencedColumnName="id")
      */
-    private $roles = [];
+    private $group;
 
     public function getId()
     {
@@ -96,19 +97,13 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function getRoles()
     {
-        $roles = $this->roles;
-
-        // guarantees that a user always has at least one role for security
-        if (empty($roles)) {
-            $roles[] = 'ROLE_ADMIN';
-        }
-
-        return array_unique($roles);
+        return $this->group->getRole();
     }
 
-    public function setRoles(array $roles)
-    {
-        $this->roles = $roles;
+    public function hasRole($role) {
+//        $role = strtoupper($role);
+//        $roles = $this->getRoles();
+//        return in_array($role, $roles, true);
     }
 
     /**
@@ -170,5 +165,53 @@ class User implements AdvancedUserInterface, \Serializable
             $this->password,
             $this->isActive
         ) = unserialize($serialized);
+    }
+
+    /**
+     * Get the value of Is Active
+     *
+     * @return mixed
+     */
+    public function getIsActive()
+    {
+        return $this->isActive;
+    }
+
+    /**
+     * Set the value of Is Active
+     *
+     * @param mixed isActive
+     *
+     * @return self
+     */
+    public function setIsActive($isActive)
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of Group
+     *
+     * @return UserGroup
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    /**
+     * Set the value of Group
+     *
+     * @param UserGroup $group
+     *
+     * @return self
+     */
+    public function setGroup(UserGroup $group)
+    {
+        $this->group = $group;
+
+        return $this;
     }
 }
